@@ -50,7 +50,6 @@ cmd = 'gcloud container clusters get-credentials azkaban-cluster --zone asia-sou
 print(getoutput(cmd))
 
 wait_for_port_ready(3306, 15)
-wait_for_port_ready(8081, 45)
 
 cmd = 'cat /azkaban/conf/azkaban.properties|grep mysql.host'
 host = getoutput(cmd).replace('mysql.host=','').rstrip()
@@ -101,7 +100,7 @@ while True:
         print('executors_in_db:', executors_in_db)
 
         # grab executors list from kubectl
-        cmd = "kubectl get po -o wide|grep exec|grep 2/2|grep Running|awk '{print $6}'"
+        cmd = "kubectl get po -o wide|grep exec|grep Running|awk '{print $6}'"
         result = getoutput(cmd).split('\n')
         result = filter(lambda l:len(l) > 0, result)
         executors_in_kube = []
@@ -129,6 +128,8 @@ while True:
 
         else:
             print('executors list consistent')
+            
+        wait_for_port_ready(8081, 45)
 
         # grab executors from web server
         URL = 'http://web.default.svc.cluster.local/status'
