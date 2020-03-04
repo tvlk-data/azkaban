@@ -11,7 +11,7 @@ import sys
 import datetime
 
 def check_exec_pods_stability():
-    cmd = 'kubectl get po -o wide|grep exec|grep 2/2|grep Running|wc -l'
+    cmd = 'kubectl get po -o wide|grep exec|grep Running|wc -l'
     num_stable_pods = int(getoutput(cmd))
 
     cmd = "kubectl get po -o wide|grep exec|grep -v Evicted|grep -Ev '0/2.*Terminating'|wc -l"
