@@ -64,8 +64,6 @@ cmd = 'cat /azkaban/conf/azkaban.properties|grep mysql.password'
 passwd = getoutput(cmd).replace('mysql.password=','').rstrip()
 
 while True:
-    time.sleep(60)
-    
     try:
         print('current datetime:', datetime.datetime.now())
         # reload executors
@@ -158,3 +156,5 @@ while True:
     except Exception as ex:
         print(traceback.format_exc())
         sys.stdout.flush()
+        
+    time.sleep(60)
