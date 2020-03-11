@@ -11,7 +11,7 @@ import sys
 import datetime
 
 def check_exec_pods_stability():
-    cmd = 'kubectl get po -o wide|grep exec|grep 2/2|grep Running|wc -l'
+    cmd = 'kubectl get po -o wide|grep exec|grep Running|wc -l'
     num_stable_pods = int(getoutput(cmd))
 
     cmd = "kubectl get po -o wide|grep exec|grep -v Evicted|grep -Ev '0/2.*Terminating'|wc -l"
@@ -50,7 +50,6 @@ cmd = 'gcloud container clusters get-credentials azkaban-cluster --zone asia-sou
 print(getoutput(cmd))
 
 wait_for_port_ready(3306, 15)
-wait_for_port_ready(8081, 45)
 
 cmd = 'cat /azkaban/conf/azkaban.properties|grep mysql.host'
 host = getoutput(cmd).replace('mysql.host=','').rstrip()
@@ -65,8 +64,6 @@ cmd = 'cat /azkaban/conf/azkaban.properties|grep mysql.password'
 passwd = getoutput(cmd).replace('mysql.password=','').rstrip()
 
 while True:
-    time.sleep(60)
-    
     try:
         print('current datetime:', datetime.datetime.now())
         # reload executors
@@ -101,7 +98,7 @@ while True:
         print('executors_in_db:', executors_in_db)
 
         # grab executors list from kubectl
-        cmd = "kubectl get po -o wide|grep exec|grep 2/2|grep Running|awk '{print $6}'"
+        cmd = "kubectl get po -o wide|grep exec|grep Running|awk '{print $6}'"
         result = getoutput(cmd).split('\n')
         result = filter(lambda l:len(l) > 0, result)
         executors_in_kube = []
@@ -129,6 +126,8 @@ while True:
 
         else:
             print('executors list consistent')
+            
+        wait_for_port_ready(8081, 45)
 
         # grab executors from web server
         URL = 'http://web.default.svc.cluster.local/status'
@@ -157,3 +156,5 @@ while True:
     except Exception as ex:
         print(traceback.format_exc())
         sys.stdout.flush()
+        
+    time.sleep(60)
